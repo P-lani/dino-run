@@ -1,3 +1,9 @@
+const ar = {};
+ar.x = 50;
+ar.y = 150;
+ar.width = 200;
+ar.height = 100;
+
 class Player {
     WALK_ANIMATION_TIMER = 200;
     walkAnimationTimer = this.WALK_ANIMATION_TIMER;
@@ -9,12 +15,16 @@ class Player {
     falling = false;
 
     attackKeyA = false;
+    attackProgress = false;
+
     JUMP_SPEED = 0.6;
     GRAVITY = 0.4;
     keyDown = false;
 
+    attackCooldown = 0;
+
     // 생성자
-    constructor(ctx, width, height, minJumpHeight, maxJumpHeight, scaleRatio) {
+    constructor(ctx, width, height, minJumpHeight, maxJumpHeight, scaleRatio, soundA, failSound) {
         this.ctx = ctx;
         this.canvas = ctx.canvas;
         this.width = width;
@@ -22,6 +32,8 @@ class Player {
         this.minJumpHeight = minJumpHeight;
         this.maxJumpHeight = maxJumpHeight;
         this.scaleRatio = scaleRatio;
+        this.soundA = soundA;
+        this.failSound = failSound;
 
         this.x = 10 * scaleRatio;
         this.y = this.canvas.height - this.height - 1.5 * scaleRatio;
@@ -60,8 +72,10 @@ class Player {
             this.jumpPressed = true;
         }
 
-        if (event.code === 'KeyA' && !this.attackKeyA) {
-            this.image = this.attackImage;
+        if (
+            (event.code === 'KeyA' || event.code === 'KeyS' || event.code === 'KeyD') &&
+            !this.attackKeyA
+        ) {
             this.attackKeyA = true;
         }
     };
@@ -70,19 +84,43 @@ class Player {
         if (event.code === 'Space') {
             this.jumpPressed = false;
         }
-        if (event.code === 'KeyA') {
+        if (event.code === 'KeyA' || event.code === 'KeyS' || event.code === 'KeyD') {
             this.attackKeyA = false;
+            this.attackProgress = false;
         }
     };
 
-    update(gameSpeed, deltaTime) {
+    update(gameSpeed, deltaTime, cactiController, playerAttack) {
         this.run(gameSpeed, deltaTime);
+
+        if (this.attackCooldown > 0) {
+            this.attackCooldown--;
+        }
 
         if (this.jumpInProgress) {
             this.image = this.standingStillImage;
         }
 
+        if (this.attackProgress) {
+            this.image = this.attackImage;
+        }
         this.jump(deltaTime);
+        this.attack(cactiController, playerAttack);
+    }
+
+    attack(cactiController, playerAttack) {
+        if (this.attackKeyA && !this.attackProgress && this.attackCooldown === 0) {
+            this.attackProgress = true;
+            if (cactiController.collideWith(playerAttack)) {
+                console.log('공격 성공');
+                this.soundA();
+                cactiController.attacked(playerAttack);
+            } else {
+                console.log('공격 실패');
+                this.failSound();
+                this.attackCooldown += 80;
+            }
+        }
     }
 
     jump(deltaTime) {

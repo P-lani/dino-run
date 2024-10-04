@@ -48,4 +48,22 @@ item.json 테이블을 참고하여 아이템마다 다른 score 획득 하도�
 
 ## 도전 기능
 
-도전중...  
+### 1. Broadcast 기능 추가  
+
+최고 점수를 갱신 했을 때, 핸들러 20번인 castHighScore 를 요청하여  
+broadcast.handler.js 에서 broadcast 를 true 로 반환하게 하였습니다.  
+기본으로 지급된 helper.js의 if (broadcast) 구문을 통해 broadcast를 하게됩니다.  
+현재, 검증과정과 데이터베이스 등록과정은 구현되지 않았습니다.  
+
+### 2. 가장 높은 점수 Record 관리
+
+( 미 구현 )
+기존에 사용하던 lacalStorage 를 계속해서 사용중
+
+### 3. 유저 정보 연결
+
+( 미 구현)
+
+### 4. Redis 연동, 게임 정보 저장
+
+( 미 구현)

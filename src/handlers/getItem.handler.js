@@ -22,9 +22,11 @@ export const getItemHandler = (userId, payload) => {
 
     // 스테이지에 맞는 아이템인지
     const unlockCheck = itemUnlocks.data.find((i) => i.stage_id === payload.currentStage);
+
     if (!unlockCheck.item_id.includes(payload.itemId)) {
         return { status: 'fail', message: ' 스테이지에 맞지 않는 아이템 입니다.' };
     }
+
     if (currentItemId) {
         if (serverTime - currentItemId.timestamp < 700) {
             console.log(serverTime - currentItemId.timestamp);

@@ -1,4 +1,5 @@
 import Player from './Player.js';
+import Slayer from './Player.Attack.js';
 import Ground from './Ground.js';
 import CactiController from './CactiController.js';
 import Score from './Score.js';
@@ -11,7 +12,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
 const GAME_SPEED_START = 1;
-const GAME_SPEED_INCREMENT = 0.00001;
+const GAME_SPEED_INCREMENT = 0.1;
 
 // 게임 크기
 const GAME_WIDTH = 800;
@@ -48,6 +49,8 @@ const ITEM_CONFIG = [
 
 // 게임 요소들
 let player = null;
+let playerAttack = null;
+
 let ground = null;
 let cactiController = null;
 let itemController = null;
@@ -59,6 +62,32 @@ let gameSpeed = GAME_SPEED_START;
 let gameover = false;
 let hasAddedEventListenersForRestart = false;
 let waitingToStart = true;
+
+// 선인장 등장 사운드
+function cactusAppearSound() {
+    const sound = new Audio('./sound/attackup.wav');
+    sound.volume = 0.6;
+    sound.play();
+}
+
+// A버튼 사운드
+function aButtonSound() {
+    const sound = new Audio('./sound/attackdown.wav');
+    sound.volume = 0.6;
+    sound.play();
+}
+
+// 실패 사운드
+function failSound() {
+    const sound = new Audio('./sound/fail.wav');
+    sound.volume = 0.6;
+    sound.play();
+}
+
+// 게임 방식에 따라 속도증가 방식 변경
+function updateGameSpeed(score) {
+    gameSpeed *= 1 + GAME_SPEED_INCREMENT;
+}
 
 function createSprites() {
     // 비율에 맞는 크기
@@ -79,7 +108,11 @@ function createSprites() {
         minJumpHeightInGame,
         maxJumpHeightInGame,
         scaleRatio,
+        aButtonSound,
+        failSound,
     );
+
+    playerAttack = new Slayer(ctx, playerWidthInGame, playerHeightInGame, scaleRatio);
 
     ground = new Ground(ctx, groundWidthInGame, groundHeightInGame, GROUND_SPEED, scaleRatio);
 
@@ -89,11 +122,17 @@ function createSprites() {
         return {
             image,
             width: cactus.width * scaleRatio,
-            height: cactus.height * scaleRatio,
+            height: cactus.height * scaleRatio * 1.5,
         };
     });
 
-    cactiController = new CactiController(ctx, cactiImages, scaleRatio, GROUND_SPEED);
+    cactiController = new CactiController(
+        ctx,
+        cactiImages,
+        scaleRatio,
+        GROUND_SPEED,
+        cactusAppearSound,
+    );
 
     const itemImages = ITEM_CONFIG.map((item) => {
         const image = new Image();
@@ -108,7 +147,7 @@ function createSprites() {
 
     itemController = new ItemController(ctx, itemImages, scaleRatio, GROUND_SPEED);
 
-    score = new Score(ctx, scaleRatio);
+    score = new Score(ctx, scaleRatio, updateGameSpeed);
 }
 
 function getScaleRatio() {
@@ -153,10 +192,6 @@ function showStartGameText() {
     const x = canvas.width / 14;
     const y = canvas.height / 2;
     ctx.fillText('Tap Screen or Press Space To Start', x, y);
-}
-
-function updateGameSpeed(deltaTime) {
-    gameSpeed += deltaTime * GAME_SPEED_INCREMENT;
 }
 
 function reset() {
@@ -206,20 +241,23 @@ function gameLoop(currentTime) {
         // 땅이 움직임
         ground.update(gameSpeed, deltaTime);
         // 선인장
-        cactiController.update(gameSpeed, deltaTime);
+        cactiController.update(gameSpeed, deltaTime, score);
         itemController.update(gameSpeed, deltaTime, score);
         // 달리기
-        player.update(gameSpeed, deltaTime);
-        updateGameSpeed(deltaTime);
+        player.update(gameSpeed, deltaTime, cactiController, playerAttack);
+
+        // updateGameSpeed(deltaTime);
 
         score.update(deltaTime);
     }
-
+    // 선인장 충돌, 게임오버
     if (!gameover && cactiController.collideWith(player)) {
         gameover = true;
         score.setHighScore();
         setupGameReset();
     }
+
+    // 아이템 충돌, 획득
     const collideWithItem = itemController.collideWith(player);
     if (collideWithItem && collideWithItem.itemId) {
         score.getItem(collideWithItem.itemId, collideWithItem.stage);
@@ -227,6 +265,8 @@ function gameLoop(currentTime) {
 
     // draw
     player.draw();
+    playerAttack.draw();
+
     cactiController.draw();
     ground.draw();
     score.draw();

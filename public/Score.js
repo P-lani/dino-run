@@ -1,4 +1,5 @@
 import { sendEvent } from './Socket.js';
+
 import itemInfo from './assets/item.json' with { type: 'json' };
 import stageInfo from './assets/stage.json' with { type: 'json' };
 
@@ -10,15 +11,15 @@ class Score {
     stage = 0;
     stageId = 1000;
 
-    constructor(ctx, scaleRatio) {
+    constructor(ctx, scaleRatio, updateGameSpeed) {
         this.ctx = ctx;
         this.canvas = ctx.canvas;
         this.scaleRatio = scaleRatio;
+        this.updateGameSpeed = updateGameSpeed;
     }
     update(deltaTime) {
         // 스테이지에 따라서 점수증가 보정
         const increaseScore = stageInfo.data[this.stage].scorePerSecond;
-        console.log(increaseScore);
         this.score += deltaTime * 0.001 * increaseScore;
 
         // 현재 점수가 다음 층 점수보다 높을 경우
@@ -35,6 +36,7 @@ class Score {
             });
             this.stage++;
             this.stageId = stageInfo.data[this.stage].id;
+            this.updateGameSpeed();
             console.log(
                 ` 스테이지 증가 ! ${this.stageId} ${stageInfo.data[this.stage].score} 도달`,
             );

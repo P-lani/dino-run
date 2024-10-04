@@ -19,7 +19,7 @@ class Cactus {
     }
 
     collideWith(sprite) {
-        const adjustBy = 99991.4;
+        const adjustBy = 1.4;
 
         // 충돌
         return (
