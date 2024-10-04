@@ -1,18 +1,17 @@
 class Ground {
-
     constructor(ctx, width, height, speed, scaleRatio) {
         this.ctx = ctx;
         this.canvas = ctx.canvas;
         this.width = width;
         this.height = height;
-        this.speed = speed;
+        this.speed = speed * 1.33;
         this.scaleRatio = scaleRatio;
 
         this.x = 0;
         this.y = this.canvas.height - this.height;
 
         this.groundImage = new Image();
-        this.groundImage.src = "images/ground.png";
+        this.groundImage.src = 'images/ground.png';
     }
 
     update(gameSpeed, deltaTime) {
@@ -20,13 +19,7 @@ class Ground {
     }
 
     draw() {
-        this.ctx.drawImage(
-            this.groundImage,
-            this.x,
-            this.y,
-            this.width,
-            this.height
-        );
+        this.ctx.drawImage(this.groundImage, this.x, this.y, this.width, this.height);
 
         this.ctx.drawImage(
             this.groundImage,
@@ -34,7 +27,7 @@ class Ground {
             this.x + this.width,
             this.y,
             this.width,
-            this.height
+            this.height,
         );
 
         // 땅이 끝났을 때 처음으로

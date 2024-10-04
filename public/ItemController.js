@@ -1,14 +1,13 @@
 import Item from './Item.js';
 import itemUnlock from './assets/item_unlock.json' with { type: 'json' };
-import stageInfo from './assets/stage.json' with { type: 'json' };
 
 class ItemController {
-    INTERVAL_MIN = 1000;
+    INTERVAL_MIN = 1500;
 
     // INTERVAL_MAX = 14000;
 
     //TEST_MODE
-    INTERVAL_MAX = 3000;
+    INTERVAL_MAX = 6000;
 
     nextInterval = null;
     items = [];

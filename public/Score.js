@@ -9,7 +9,7 @@ class Score {
     HIGH_SCORE_KEY = 'highScore';
     stageChange = true;
     stage = 0;
-    stageId = 1000;
+    stageId = stageInfo.data[0].id;
 
     constructor(ctx, scaleRatio, updateGameSpeed) {
         this.ctx = ctx;
@@ -17,7 +17,7 @@ class Score {
         this.scaleRatio = scaleRatio;
         this.updateGameSpeed = updateGameSpeed;
     }
-    update(deltaTime) {
+    update(deltaTime, cacti, bgmTime) {
         // 스테이지에 따라서 점수증가 보정
         const increaseScore = stageInfo.data[this.stage].scorePerSecond;
         this.score += deltaTime * 0.001 * increaseScore;
@@ -36,6 +36,10 @@ class Score {
             });
             this.stage++;
             this.stageId = stageInfo.data[this.stage].id;
+            cacti.rhythm = 0;
+            bgmTime = 0;
+            cacti.cacti = [];
+            cacti.patternIndex = 0;
             this.updateGameSpeed();
             console.log(
                 ` 스테이지 증가 ! ${this.stageId} ${stageInfo.data[this.stage].score} 도달`,

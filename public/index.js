@@ -11,7 +11,7 @@ import { sendEvent } from './Socket.js';
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-const GAME_SPEED_START = 1;
+const GAME_SPEED_START = 0.9;
 const GAME_SPEED_INCREMENT = 0.1;
 
 // 게임 크기
@@ -63,6 +63,8 @@ let gameover = false;
 let hasAddedEventListenersForRestart = false;
 let waitingToStart = true;
 
+let bgmTime = 0;
+
 // 선인장 등장 사운드
 function cactusAppearSound() {
     const sound = new Audio('./sound/attackup.wav');
@@ -81,6 +83,13 @@ function aButtonSound() {
 function failSound() {
     const sound = new Audio('./sound/fail.wav');
     sound.volume = 0.6;
+    sound.play();
+}
+
+// 배경음..
+function drumSound() {
+    const sound = new Audio('./sound/drum.mp3');
+    sound.volume = 0.12;
     sound.play();
 }
 
@@ -204,6 +213,7 @@ function reset() {
     itemController.reset();
     score.reset();
     gameSpeed = GAME_SPEED_START;
+    bgmTime = 0;
     sendEvent(2, { timestamp: Date.now() });
 }
 
@@ -236,6 +246,12 @@ function gameLoop(currentTime) {
 
     clearScreen();
 
+    bgmTime += deltaTime * gameSpeed;
+    if (bgmTime >= 800 && !gameover) {
+        drumSound();
+        bgmTime = 0;
+    }
+
     if (!gameover && !waitingToStart) {
         // update
         // 땅이 움직임
@@ -248,7 +264,7 @@ function gameLoop(currentTime) {
 
         // updateGameSpeed(deltaTime);
 
-        score.update(deltaTime);
+        score.update(deltaTime, cactiController, bgmTime);
     }
     // 선인장 충돌, 게임오버
     if (!gameover && cactiController.collideWith(player)) {
