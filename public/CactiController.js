@@ -12,15 +12,16 @@ class CactiController {
 
     patternIndex = 0;
 
-    findStage = CactusPattern.data[0].stage_id;
-    pattern = [1, 0, 1, 0, 1, 0, 1, 0];
+    //시작 패턴
+    findStage = CactusPattern.data[3].stage_id;
+    pattern = [];
 
     constructor(ctx, cactiImages, scaleRatio, speed, sound) {
         this.ctx = ctx;
         this.canvas = ctx.canvas;
         this.cactiImages = cactiImages;
         this.scaleRatio = scaleRatio;
-        this.speed = speed * 1.33;
+        this.speed = speed;
         this.sound = sound;
 
         // this.setNextCactusTime();
@@ -46,34 +47,30 @@ class CactiController {
 
         const cactus = new Cactus(
             this.ctx,
-            x,
+            x * 0.77,
             y,
             cactusImage.width,
             cactusImage.height,
             cactusImage.image,
         );
 
-        this.sound();
         this.cacti.push(cactus);
     }
 
     update(gameSpeed, deltaTime, score) {
         this.rhythm += deltaTime * gameSpeed;
 
-        if (this.rhythm >= 3200) {
-            if (this.pattern[this.patternIndex] === 0) {
-                this.rhythm = 3000;
-                this.patternIndex++;
-            } else {
-                this.rhythm = 3200 - this.pattern[this.patternIndex] * 200;
-                this.patternIndex++;
+        if (this.rhythm >= 1600) {
+            if (this.pattern[this.patternIndex] !== 0) {
                 this.createCactus(gameSpeed, score, deltaTime);
-                console.log(this.pattern[this.patternIndex] * 200);
+                this.sound();
             }
-            if (this.patternIndex === 8) {
-                this.rhythm = 1400;
-                this.patternIndex = 0;
+            this.rhythm -= 200;
+            this.patternIndex++;
 
+            if (this.patternIndex === 8) {
+                this.rhythm = -200;
+                this.patternIndex = 0;
                 this.findStage = CactusPattern.data.filter((item) =>
                     item.stage_id.includes(score.stageId),
                 );
@@ -82,6 +79,31 @@ class CactiController {
                     this.findStage[Math.floor(Math.random() * this.findStage.length)].pattern;
             }
         }
+
+        // if (this.rhythm >= 3200) {
+        //     if (this.pattern[this.patternIndex] === 0) {
+        //         this.rhythm -= 400;
+        //         this.patternIndex++;
+        //     } else {
+        //         this.rhythm -= this.pattern[this.patternIndex] * 400;
+        //         this.patternIndex++;
+        //         this.createCactus(gameSpeed, score, deltaTime);
+        //         this.sound();
+        //     }
+        //     if (this.patternIndex === 8) {
+        //         this.rhythm = 1600;
+        //         this.patternIndex = 0;
+
+        //         this.findStage = CactusPattern.data.filter((item) =>
+        //             item.stage_id.includes(score.stageId),
+        //         );
+
+        //         // this.pattern =
+        //         //     this.findStage[Math.floor(Math.random() * this.findStage.length)].pattern;
+
+        //         this.pattern = CactusPattern.data[0].pattern;
+        //     }
+        // }
 
         // this.setNextCactusTime();
 
@@ -114,6 +136,8 @@ class CactiController {
         this.cacti = [];
         this.rhythm = 0;
         this.patternIndex = 0;
+        this.findStage = CactusPattern.data[0].stage_id;
+        this.pattern = [1, 0, 0, 1, 1, 0, 1, 0];
     }
 }
 

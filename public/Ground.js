@@ -4,7 +4,7 @@ class Ground {
         this.canvas = ctx.canvas;
         this.width = width;
         this.height = height;
-        this.speed = speed * 1.33;
+        this.speed = speed;
         this.scaleRatio = scaleRatio;
 
         this.x = 0;

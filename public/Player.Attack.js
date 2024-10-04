@@ -7,7 +7,7 @@ class Slayer {
         this.height = height * 1.5;
         this.scaleRatio = scaleRatio;
 
-        this.x = 10 * scaleRatio + 70;
+        this.x = 80 * scaleRatio;
         this.y = this.canvas.height - this.height - 1.5 * scaleRatio;
 
         this.standingStillImage = new Image();

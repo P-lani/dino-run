@@ -11,7 +11,7 @@ import { sendEvent } from './Socket.js';
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-const GAME_SPEED_START = 0.9;
+const GAME_SPEED_START = 1.0;
 const GAME_SPEED_INCREMENT = 0.1;
 
 // 게임 크기
@@ -68,21 +68,21 @@ let bgmTime = 0;
 // 선인장 등장 사운드
 function cactusAppearSound() {
     const sound = new Audio('./sound/attackup.wav');
-    sound.volume = 0.6;
+    sound.volume = 0.5;
     sound.play();
 }
 
 // A버튼 사운드
 function aButtonSound() {
     const sound = new Audio('./sound/attackdown.wav');
-    sound.volume = 0.6;
+    sound.volume = 0.5;
     sound.play();
 }
 
 // 실패 사운드
 function failSound() {
     const sound = new Audio('./sound/fail.wav');
-    sound.volume = 0.6;
+    sound.volume = 0.5;
     sound.play();
 }
 
@@ -95,7 +95,7 @@ function drumSound() {
 
 // 게임 방식에 따라 속도증가 방식 변경
 function updateGameSpeed(score) {
-    gameSpeed *= 1 + GAME_SPEED_INCREMENT;
+    gameSpeed += GAME_SPEED_INCREMENT;
 }
 
 function createSprites() {
@@ -246,6 +246,7 @@ function gameLoop(currentTime) {
 
     clearScreen();
 
+    // 배경음;
     bgmTime += deltaTime * gameSpeed;
     if (bgmTime >= 800 && !gameover) {
         drumSound();
@@ -257,7 +258,7 @@ function gameLoop(currentTime) {
         // 땅이 움직임
         ground.update(gameSpeed, deltaTime);
         // 선인장
-        cactiController.update(gameSpeed, deltaTime, score);
+        cactiController.update(gameSpeed, deltaTime, score, drumSound);
         itemController.update(gameSpeed, deltaTime, score);
         // 달리기
         player.update(gameSpeed, deltaTime, cactiController, playerAttack);
@@ -268,9 +269,9 @@ function gameLoop(currentTime) {
     }
     // 선인장 충돌, 게임오버
     if (!gameover && cactiController.collideWith(player)) {
-        gameover = true;
-        score.setHighScore();
-        setupGameReset();
+        // gameover = true;
+        // score.setHighScore();
+        // setupGameReset();
     }
 
     // 아이템 충돌, 획득

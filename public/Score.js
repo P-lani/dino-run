@@ -36,7 +36,7 @@ class Score {
             });
             this.stage++;
             this.stageId = stageInfo.data[this.stage].id;
-            cacti.rhythm = 0;
+            cacti.rhythm = -200;
             bgmTime = 0;
             cacti.cacti = [];
             cacti.patternIndex = 0;
