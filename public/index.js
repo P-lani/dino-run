@@ -269,9 +269,9 @@ function gameLoop(currentTime) {
     }
     // 선인장 충돌, 게임오버
     if (!gameover && cactiController.collideWith(player)) {
-        // gameover = true;
-        // score.setHighScore();
-        // setupGameReset();
+        gameover = true;
+        score.setHighScore();
+        setupGameReset();
     }
 
     // 아이템 충돌, 획득
